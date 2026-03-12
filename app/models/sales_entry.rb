@@ -8,7 +8,8 @@ class SalesEntry < ApplicationRecord
    scope :active, -> { where(status: :active) }
 
   validates :amount, presence: true, numericality: { greater_than: 0 }
-  validates :method, presence: true, inclusion: { in: %w[direct referral] }
+  validates :method, presence: true
+  validate :method_must_be_in_user_list
   validates :goal_id, presence: true
 
   before_create :calculate_and_assign_xp
@@ -18,8 +19,17 @@ class SalesEntry < ApplicationRecord
 
   private
 
+  def method_must_be_in_user_list
+    return unless goal&.user
+    unless goal.user.sales_methods.include?(method)
+      errors.add(:method, "is not a valid sales channel for your profile")
+    end
+  end
+
   def calculate_and_assign_xp
-    multiplier = method == 'referral' ? 1.5 : 1.0
+    # The first method in the user's list is usually 'Direct' (1.0x)
+    # Any other custom methods (Referral, Website, etc.) get the 1.5x bonus
+    multiplier = (method == goal.user.sales_methods.first) ? 1.0 : 1.5
     self.xp_earned = (amount * 0.01 * multiplier).to_i
   end
 

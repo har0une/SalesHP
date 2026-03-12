@@ -38,28 +38,14 @@
           <%= link_to root_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-500/20 transition-all hover:scale-[1.02]" do %>
             <span>DASHBOARD</span>
           <% end %>
-          <a href="/orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase">Orders</a>
-          <a href="/analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase">Stats</a>
+          <%= link_to orders_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase" do %>
+            <span>Orders</span>
+          <% end %>
+          <%= link_to analytics_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase" do %>
+            <span>Stats</span>
+          <% end %>
         </nav>
 
-        <!-- Rank Progression -->
-        <div class="p-4 border-t border-white/20 bg-white/5">
-          <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Rank Path</p>
-          <div class="space-y-3">
-            <div class="flex items-center gap-3 opacity-40">
-              <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
-              <span class="text-[10px] font-bold">SALES CHAMPION</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]"></div>
-              <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase"><%= @user.rank || "BEGINNER SELLER" %></span>
-            </div>
-            <div class="flex items-center gap-3 opacity-40">
-              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-              <span class="text-[10px] font-bold">BEGINNER SELLER</span>
-            </div>
-          </div>
-        </div>
 
         <!-- Theme Toggle (Simplified for Rails context) -->
         <div class="p-4 border-t border-white/20 flex items-center justify-between">
@@ -92,11 +78,50 @@
           <%= link_to root_path, class: "flex items-center gap-1 text-purple-600" do %>
             <span class="text-[10px] font-black uppercase tracking-widest">Dash</span>
           <% end %>
-          <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-emerald-500 rounded-xl shadow-lg -mt-8 flex items-center justify-center text-white">+</div>
-          <a href="/orders" class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Orders</a>
+          <button onclick="document.getElementById('post-modal').classList.toggle('hidden')" class="w-10 h-10 bg-gradient-to-br from-purple-500 to-emerald-500 rounded-xl shadow-lg -mt-8 flex items-center justify-center text-white">+</button>
+          <%= link_to orders_path, class: "text-gray-500 text-[10px] font-black uppercase tracking-widest" do %>
+            <span>Orders</span>
+          <% end %>
         </div>
       </nav>
 
+    </div>
+
+    <!-- 7. Quick Post Modal (Global) -->
+    <div class="fixed bottom-10 right-10 z-50 hidden lg:block">
+      <button onclick="document.getElementById('post-modal').classList.toggle('hidden')" class="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl shadow-2xl shadow-purple-600/30 text-white text-3xl font-bold flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+        +
+      </button>
+    </div>
+
+    <div id="post-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
+      <div class="glass-strong-style w-full max-w-lg rounded-[2.5rem] p-10 relative">
+        <button onclick="document.getElementById('post-modal').classList.add('hidden')" class="absolute top-8 right-8 text-gray-500 hover:text-white text-2xl">×</button>
+        <h4 class="text-2xl font-display font-black text-gray-800 dark:text-white mb-8">Post Sales Transaction</h4>
+        <%= form_with model: SalesEntry.new, url: sales_entries_path, class: "space-y-6" do |f| %>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Assigned Mission</label>
+            <%= f.select :goal_id, @user.goals.where(active: true).map { |g| [g.title, g.id] }, { selected: (@goal&.id || @user.master_ledger.id) }, class: "w-full bg-white/10 dark:bg-gray-800 border-white/20 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none" %>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Receipt Amount</label>
+            <%= f.number_field :amount, placeholder: "50,000", class: "w-full bg-white/10 border-white/20 rounded-2xl px-6 py-4 text-lg font-black focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none", required: true %>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Method Channel</label>
+            <% if @user.sales_methods.count > 1 %>
+              <%= f.select :method, @user.sales_methods.map { |m| [m.to_s.titleize, m] }, {}, class: "w-full bg-white/10 dark:bg-gray-800 border-white/20 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none" %>
+            <% else %>
+              <% method_name = @user.sales_methods.first || 'Direct' %>
+              <%= f.hidden_field :method, value: method_name %>
+              <div class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold text-gray-400">
+                Fixed Channel: <%= method_name.titleize %>
+              </div>
+            <% end %>
+          </div>
+          <%= f.submit "AUTHORIZE LOG ENTRY", class: "w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black py-5 rounded-2xl shadow-xl shadow-purple-600/20 hover:scale-[1.02] transition-all cursor-pointer uppercase tracking-widest" %>
+        <% end %>
+      </div>
     </div>
   </body>
 </html>

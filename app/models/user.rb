@@ -1,6 +1,23 @@
 class User < ApplicationRecord
   has_many :goals
 
+  def master_ledger
+    goals.find_or_create_by!(title: "General Sales Ledger") do |g|
+      g.active = true
+      g.target_amount = 0 # No specific target for the ledger
+      g.start_date = created_at.to_date
+      g.deadline = 10.years.from_now.to_date
+    end
+  end
+  serialize :sales_methods, type: Array, coder: JSON
+
+  after_initialize :set_default_sales_methods
+
+  def sales_methods
+    methods = super
+    (methods.is_a?(Array) && methods.any?) ? methods : ["Direct", "Referral"]
+  end
+
   def current_streak
     streak = 0
     date = Date.today
@@ -85,5 +102,11 @@ class User < ApplicationRecord
                else "Sales Champion"
                end
     update(rank: new_rank) if rank != new_rank
+  end
+
+  private
+
+  def set_default_sales_methods
+    self.sales_methods ||= ["Direct", "Referral"] if has_attribute?(:sales_methods)
   end
 end

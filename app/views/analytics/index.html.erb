@@ -14,8 +14,37 @@
       </span>
     </div>
   </div>
-
-  <!-- 1.5 Rank Path Progression -->
+  <!-- 1.2 Sales Channel Profile Management -->
+  <div class="glass-style rounded-3xl p-8 mb-4 border-l-4 border-l-emerald-500 bg-gradient-to-r from-emerald-500/5 to-transparent relative overflow-hidden group">
+    <!-- Decorative background icon -->
+    <div class="absolute -right-4 -bottom-4 text-8xl opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">📡</div>
+    
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">📡</div>
+        <div>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sales Channel Profile</p>
+          <h4 class="text-lg font-black text-gray-800 dark:text-white">Active Channels</h4>
+        </div>
+      </div>
+      
+      <%= form_with url: update_methods_path, method: :patch, class: "flex-1 flex flex-col md:flex-row gap-3" do |f| %>
+        <div class="relative flex-1">
+          <%= text_field_tag :methods, @user.sales_methods.join(', '), class: "w-full bg-white/10 border-white/20 rounded-2xl px-6 py-4 text-xs font-bold focus:ring-4 focus:ring-emerald-500/20 text-gray-800 dark:text-white outline-none placeholder-gray-400", placeholder: "e.g. Direct, Social Media, Website" %>
+          <div class="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1 hidden md:flex">
+            <% @user.sales_methods.take(2).each do |m| %>
+              <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-600 text-[8px] font-black uppercase"><%= m %></span>
+            <% end %>
+            <% if @user.sales_methods.count > 2 %>
+              <span class="px-2 py-0.5 rounded-lg bg-gray-500/20 text-gray-600 text-[8px] font-black uppercase">+<%= @user.sales_methods.count - 2 %></span>
+            <% end %>
+          </div>
+        </div>
+        <%= f.submit "UPDATE PROFILE", class: "bg-emerald-500 text-white text-[9px] font-black px-8 py-4 rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-[1.05] transition-all cursor-pointer uppercase tracking-widest" %>
+      <% end %>
+    </div>
+    <p class="text-[9px] font-bold text-gray-400 mt-4 ml-1 md:ml-16 italic opacity-70">* Separate channels with commas. The first channel is your primary direct source.</p>
+  </div>
   <div class="glass-style rounded-3xl p-8 border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-500/5 to-transparent">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-4">
@@ -60,11 +89,14 @@
     <% end %>
   </div>
 
-  <!-- 3. Sales History -->
+  <!-- 3. Sales Activity Preview -->
   <div class="glass-style rounded-[2.5rem] p-8 lg:p-10">
     <div class="flex items-center justify-between mb-8">
-      <h3 class="text-xl font-display font-black tracking-tight">Full Sales History</h3>
-      <span class="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-4 py-2 rounded-full uppercase tracking-widest">Verified Entries</span>
+      <div>
+        <h3 class="text-xl font-display font-black tracking-tight">Recent Activity</h3>
+        <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Snapshot of latest entries</p>
+      </div>
+      <%= link_to "View All Records →", orders_path, class: "text-[10px] font-black text-purple-500 bg-purple-500/10 px-6 py-3 rounded-full hover:bg-purple-500/20 uppercase tracking-widest transition-all" %>
     </div>
 
     <div class="overflow-x-auto">
@@ -86,7 +118,7 @@
               <td class="font-black text-gray-800 dark:text-white">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs">
-                    <%= sale.method == 'referral' ? '🔗' : '👤' %>
+                    <%= sale.method == @user.sales_methods.first ? '👤' : '📡' %>
                   </div>
                   <span class="uppercase tracking-widest text-[10px]"><%= sale.method %></span>
                 </div>

@@ -1,12 +1,16 @@
 module SalesHp
   class PatternBrain
-    def initialize(goal)
-      @goal = goal
-      @active_sales = goal.sales_entries.active
+    def initialize(goal_or_sales)
+      if goal_or_sales.is_a?(ActiveRecord::Relation)
+        @active_sales = goal_or_sales
+      else
+        @goal = goal_or_sales
+        @active_sales = goal_or_sales.sales_entries.active
+      end
     end
 
     def best_day
-      day_stats = @active_sales.group("strftime('%w', created_at)").sum(:amount)
+      day_stats = @active_sales.group("strftime('%w', sales_entries.created_at)").sum(:amount)
       best_day_num = day_stats.max_by { |_day, sum| sum }&.first
       return "N/A" unless best_day_num
 

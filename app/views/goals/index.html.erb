@@ -1,0 +1,129 @@
+<div class="flex flex-col gap-10">
+  <!-- 1. Header Section -->
+  <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+    <div>
+      <h1 class="text-4xl font-display font-black tracking-tight bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        Mission Control
+      </h1>
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mt-1 ml-1">Strategy Architect & Global Ledger</p>
+    </div>
+    
+    <div class="flex gap-4">
+      <div class="glass-style rounded-2xl px-6 py-3 border-l-4 border-purple-500">
+        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Active Objectives</p>
+        <p class="text-sm font-black text-purple-600 font-mono"><%= @active_missions.count %></p>
+      </div>
+      <div class="glass-style rounded-2xl px-6 py-3 border-l-4 border-emerald-500">
+        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Total Transmissions</p>
+        <p class="text-sm font-black text-emerald-500 font-mono"><%= @all_sales.count %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- 2. Mission Architect (Creation Form) -->
+    <div class="lg:col-span-1">
+      <div class="glass-style rounded-[2.5rem] p-8 border-t-4 border-purple-500 sticky top-10">
+        <h3 class="text-xl font-display font-black tracking-tight mb-2">Mission Architect</h3>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8">Deploy New Objectives</p>
+        
+        <%= form_with model: Goal.new, url: goals_path, class: "space-y-6" do |f| %>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Mission Title</label>
+            <%= f.text_field :title, placeholder: "e.g. Q2 Expansion Target", class: "w-full bg-white/10 dark:bg-gray-800 border-white/10 rounded-2xl px-5 py-4 text-xs font-bold focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none", required: true %>
+          </div>
+          
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Financial Target (₦)</label>
+            <%= f.number_field :target_amount, placeholder: "1,000,000", class: "w-full bg-white/10 dark:bg-gray-800 border-white/10 rounded-2xl px-5 py-4 text-xs font-bold focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none", required: true %>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Launch Date</label>
+              <%= f.date_field :start_date, value: Date.today, class: "w-full bg-white/10 dark:bg-gray-800 border-white/10 rounded-2xl px-4 py-4 text-[10px] font-bold text-gray-800 dark:text-white outline-none" %>
+            </div>
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Deadline</label>
+              <%= f.date_field :deadline, value: 30.days.from_now.to_date, class: "w-full bg-white/10 dark:bg-gray-800 border-white/10 rounded-2xl px-4 py-4 text-[10px] font-bold text-gray-800 dark:text-white outline-none" %>
+            </div>
+          </div>
+
+          <%= f.submit "INITIALIZE MISSION", class: "w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[9px] font-black py-5 rounded-2xl shadow-xl shadow-purple-600/20 hover:scale-[1.02] transition-all cursor-pointer uppercase tracking-widest" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 3. Active Missions & Ledger -->
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Active Missions List -->
+      <div class="space-y-4">
+        <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Active Strategic Units</h4>
+        <% @active_missions.each do |mission| %>
+          <div class="glass-style rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border-l-4 border-purple-500 relative overflow-hidden group">
+            <div class="flex items-center gap-5">
+              <div class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-xl">🎯</div>
+              <div>
+                <h5 class="text-sm font-black text-gray-800 dark:text-white uppercase"><%= mission.title %></h5>
+                <p class="text-[10px] font-bold text-gray-400">Target: ₦<%= number_with_delimiter(mission.target_amount.to_i) %> • Ends <%= mission.deadline.strftime("%b %d") %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+               <div class="text-right">
+                  <p class="text-[9px] font-black text-purple-500 uppercase">Current Progress</p>
+                  <p class="text-xs font-black text-gray-800 dark:text-gray-200">₦<%= number_with_delimiter(mission.sales_entries.active.sum(:amount).to_i) %></p>
+               </div>
+               <%= button_to "CLOSE", goal_path(mission), method: :patch, class: "text-[9px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/10 transition-all", data: { turbo_confirm: "Setting mission to inactive. Projections will pause." } %>
+            </div>
+          </div>
+        <% end %>
+        <% if @active_missions.empty? %>
+          <div class="py-10 text-center glass-style rounded-3xl border-dashed">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">No Active Missions. Initialize an objective to start tracking velocity.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Universal Ledger (Simplified Table) -->
+      <div class="glass-style rounded-[2.5rem] p-8 border border-white/10">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h4 class="text-lg font-display font-black tracking-tight">Recent Transmissions</h4>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Cross-Mission Sales Ledger</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full border-separate border-spacing-y-3">
+            <thead>
+              <tr class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">
+                <th class="px-4 pb-2">Timestamp</th>
+                <th class="pb-2">Revenue</th>
+                <th class="pb-2">Source</th>
+                <th class="pb-2 text-right">XP</th>
+              </tr>
+            </thead>
+            <tbody class="text-xs">
+              <% @records.each do |record| %>
+                <tr class="glass-style bg-white/2 rounded-2xl hover:bg-white/5 transition-all">
+                  <td class="px-6 py-4 first:rounded-l-2xl border-l-[1px] border-white/5 font-bold text-gray-500">
+                    <%= record.created_at.strftime("%b %d • %H:%M") %>
+                  </td>
+                  <td class="font-mono font-black text-gray-800 dark:text-white">
+                    ₦<%= number_with_delimiter(record.amount.to_i) %>
+                  </td>
+                  <td>
+                    <span class="px-2 py-1 rounded-lg bg-white/10 text-[9px] font-black uppercase text-gray-400"><%= record.method %></span>
+                  </td>
+                  <td class="px-6 py-4 last:rounded-r-2xl border-r-[1px] border-white/5 text-right font-black text-purple-500">
+                    +<%= record.xp_earned %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

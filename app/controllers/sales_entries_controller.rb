@@ -1,7 +1,13 @@
 class SalesEntriesController < ApplicationController
   def create
-    @goal = Goal.find(params[:sales_entry][:goal_id])
-    @sales_entry = @goal.sales_entries.new(sales_entry_params)
+    # Use the @goal set by the application controller, or fallback to master_ledger if params are weird
+    target_goal = if params[:sales_entry][:goal_id].present?
+                    @user.goals.find(params[:sales_entry][:goal_id])
+                  else
+                    @goal
+                  end
+
+    @sales_entry = target_goal.sales_entries.new(sales_entry_params)
 
     if @sales_entry.save
       redirect_to root_path, notice: "Sale tracked successfully! +\#{@sales_entry.xp_earned} XP"

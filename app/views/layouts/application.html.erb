@@ -1,29 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full scroll-smooth">
   <head>
-    <title><%= content_for(:title) || "Sales Hp" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Sales Hp">
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>SalesHP | Level Up Your Sales</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="h-full font-sans antialiased text-gray-800 dark:text-gray-100 bg-gradient-to-br from-purple-50 via-blue-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
+    
+    <!-- Background Animated Blobs -->
+    <div class="fixed inset-0 opacity-40 pointer-events-none overflow-hidden select-none z-0">
+      <div class="absolute top-0 left-0 w-72 h-72 bg-purple-300 dark:bg-purple-900/50 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+      <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-200 dark:bg-emerald-900/50 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-0 left-0 w-72 h-72 bg-blue-300 dark:bg-blue-900/50 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="relative z-10 flex min-h-screen">
+      
+      <!-- SalesHP Sidebar -->
+      <aside class="hidden lg:flex flex-col w-64 glass-strong-style border-r border-white/20 fixed inset-y-0 z-50">
+        <!-- Logo Section -->
+        <div class="p-6 border-b border-white/20">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-emerald-500 rounded-xl shadow-lg flex items-center justify-center text-white font-black">HP</div>
+            <div>
+              <h1 class="text-lg font-display font-bold text-gray-800 dark:text-gray-100 leading-tight">SalesHP</h1>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Level Up</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="flex-1 p-4 space-y-2">
+          <%= link_to root_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-500/20 transition-all hover:scale-[1.02]" do %>
+            <span>DASHBOARD</span>
+          <% end %>
+          <a href="/orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase">Orders</a>
+          <a href="/analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase">Stats</a>
+        </nav>
+
+        <!-- Rank Progression -->
+        <div class="p-4 border-t border-white/20 bg-white/5">
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Rank Path</p>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 opacity-40">
+              <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+              <span class="text-[10px] font-bold">SALES CHAMPION</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]"></div>
+              <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase"><%= @user.rank || "BEGINNER SELLER" %></span>
+            </div>
+            <div class="flex items-center gap-3 opacity-40">
+              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+              <span class="text-[10px] font-bold">BEGINNER SELLER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle (Simplified for Rails context) -->
+        <div class="p-4 border-t border-white/20 flex items-center justify-between">
+          <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Theme</span>
+          <button onclick="document.documentElement.classList.toggle('dark')" class="w-10 h-5 bg-gray-200 dark:bg-gray-700 rounded-full relative transition-colors">
+            <div class="absolute top-0.5 left-0.5 dark:left-5 w-4 h-4 bg-white rounded-full transition-all shadow-sm"></div>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 lg:pl-64 flex flex-col min-w-0 h-screen overflow-y-auto bg-transparent">
+        <div class="max-w-5xl w-full mx-auto p-4 lg:p-10 pb-32 lg:pb-10">
+          
+          <!-- Flash Messages in Glass -->
+          <% if notice %>
+            <div class="mb-8 p-4 glass-style rounded-2xl border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex justify-between">
+              <%= notice %>
+              <button onclick="this.parentElement.remove()" class="opacity-50 hover:opacity-100">×</button>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+
+      <!-- Mobile Nav for SalesHP -->
+      <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong-style border-t border-white/20 pb-safe">
+        <div class="flex justify-around items-center h-16 px-4">
+          <%= link_to root_path, class: "flex items-center gap-1 text-purple-600" do %>
+            <span class="text-[10px] font-black uppercase tracking-widest">Dash</span>
+          <% end %>
+          <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-emerald-500 rounded-xl shadow-lg -mt-8 flex items-center justify-center text-white">+</div>
+          <a href="/orders" class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Orders</a>
+        </div>
+      </nav>
+
+    </div>
   </body>
 </html>

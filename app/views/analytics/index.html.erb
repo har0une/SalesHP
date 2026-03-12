@@ -1,0 +1,111 @@
+<div class="flex flex-col gap-10">
+  <!-- 1. Header -->
+  <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+    <div>
+      <h1 class="text-4xl font-display font-black tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+        Revenue Records
+      </h1>
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mt-1 ml-1">Comprehensive Sales Audit</p>
+    </div>
+    <div class="glass-style rounded-2xl px-6 py-3 flex items-center gap-3">
+      <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Lifetime:</span>
+      <span class="text-sm font-bold text-emerald-500 tabular-nums tracking-wider font-mono">
+        ₦<%= number_with_delimiter(@revenue_total.to_i) %>
+      </span>
+    </div>
+  </div>
+
+  <!-- 1.5 Rank Path Progression -->
+  <div class="glass-style rounded-3xl p-8 border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-500/5 to-transparent">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/20">👑</div>
+        <div>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Rank Path</p>
+          <h4 class="text-lg font-black text-gray-800 dark:text-white"><%= @user.rank %></h4>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Next Target</p>
+        <h4 class="text-sm font-black text-purple-600 dark:text-purple-400"><%= @user.next_rank_name %></h4>
+      </div>
+    </div>
+    <div class="w-full h-3 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden shadow-inner">
+      <div class="h-full bg-gradient-to-r from-purple-500 to-emerald-500 transition-all duration-1000" style="width: <%= @user.xp_progress_pct %>%"></div>
+    </div>
+    <div class="flex justify-between mt-2">
+      <span class="text-[10px] font-bold text-gray-400"><%= @user.total_xp %> XP</span>
+      <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest"><%= 100 - @user.xp_progress_pct %>% to Level Up</span>
+      <span class="text-[10px] font-bold text-gray-400"><%= @user.next_rank_xp_threshold %> XP</span>
+    </div>
+  </div>
+
+  <!-- 2. Revenue Grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <% [
+      ['Today', @revenue_today, 'from-emerald-500 to-teal-400'],
+      ['This Week', @revenue_week, 'from-blue-500 to-indigo-400'],
+      ['This Month', @revenue_month, 'from-purple-500 to-pink-400'],
+      ['This Year', @revenue_year, 'from-orange-500 to-red-400']
+    ].each do |label, amount, gradient| %>
+      <div class="glass-style rounded-3xl p-6 group transition-all hover:scale-[1.02]">
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4"><%= label %></p>
+        <h3 class="text-xl lg:text-2xl font-display font-black tracking-tighter mb-2 font-mono">
+          ₦<%= number_to_human(amount, units: { thousand: 'k', million: 'm' }) %>
+        </h3>
+        <div class="w-full h-1 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r <%= gradient %> w-2/3"></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 3. Sales History -->
+  <div class="glass-style rounded-[2.5rem] p-8 lg:p-10">
+    <div class="flex items-center justify-between mb-8">
+      <h3 class="text-xl font-display font-black tracking-tight">Full Sales History</h3>
+      <span class="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-4 py-2 rounded-full uppercase tracking-widest">Verified Entries</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-separate border-spacing-y-3">
+        <thead>
+          <tr class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">
+            <th class="px-4 pb-4">Date</th>
+            <th class="pb-4">Source</th>
+            <th class="pb-4">Amount</th>
+            <th class="pb-4 text-right">Reward</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <% @recent_records.each do |sale| %>
+            <tr class="glass-style bg-white/5 rounded-2xl group transition-all hover:bg-white/10">
+              <td class="px-6 py-5 first:rounded-l-2xl font-bold text-gray-500 tabular-nums">
+                <%= sale.created_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="font-black text-gray-800 dark:text-white">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs">
+                    <%= sale.method == 'referral' ? '🔗' : '👤' %>
+                  </div>
+                  <span class="uppercase tracking-widest text-[10px]"><%= sale.method %></span>
+                </div>
+              </td>
+              <td class="font-mono font-black text-emerald-500">
+                ₦<%= number_with_delimiter(sale.amount.to_i) %>
+              </td>
+              <td class="px-6 py-5 last:rounded-r-2xl text-right">
+                <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 bg-purple-500/10 px-3 py-1.5 rounded-xl">+<%= sale.xp_earned %> XP</span>
+              </td>
+            </tr>
+          <% end %>
+          <% if @recent_records.empty? %>
+            <tr>
+              <td colspan="4" class="text-center py-20 text-gray-500 font-bold uppercase tracking-widest text-xs">No records found. Start logging sales!</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

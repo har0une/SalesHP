@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  goal: one
+  amount: 5000.00
+  method: direct
+  xp_earned: 50
+  entry_date: 2026-03-11 12:03:26
+  status: 0
+
+two:
+  goal: two
+  amount: 10000.00
+  method: referral
+  xp_earned: 150
+  entry_date: 2026-03-11 12:03:26
+  status: 0

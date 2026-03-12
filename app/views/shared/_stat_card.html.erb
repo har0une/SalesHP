@@ -1,0 +1,20 @@
+<div class="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 group hover:shadow-lg hover:shadow-primary/5 transition-all">
+  <div class="flex justify-between items-start">
+    <div class="p-2 rounded-xl bg-muted/50 text-primary">
+      <% if local_assigns[:icon] %>
+        <%= icon %>
+      <% else %>
+        <span class="text-xs">✦</span>
+      <% end %>
+    </div>
+    <% if local_assigns[:trend] %>
+      <span class="text-[10px] font-black <%= trend.positive? ? 'text-primary' : 'text-destructive' %>">
+        <%= trend.positive? ? '+' : '' %><%= trend %>%
+      </span>
+    <% end %>
+  </div>
+  <div>
+    <p class="text-[10px] font-display font-medium text-muted-foreground uppercase tracking-widest"><%= title %></p>
+    <p class="text-2xl font-black text-foreground tracking-tight"><%= value %></p>
+  </div>
+</div>

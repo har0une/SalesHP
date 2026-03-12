@@ -33,16 +33,14 @@
           </div>
         </div>
         
+
         <!-- Navigation -->
         <nav class="flex-1 p-4 space-y-2">
           <%= link_to root_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-500/20 transition-all hover:scale-[1.02]" do %>
             <span>DASHBOARD</span>
           <% end %>
-          <%= link_to orders_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase" do %>
-            <span>Orders</span>
-          <% end %>
-          <%= link_to analytics_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/20 font-bold text-xs transition-all uppercase" do %>
-            <span>Stats</span>
+          <%= link_to analytics_path, class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl #{current_page?(analytics_path) ? 'bg-purple-600/10 text-purple-600' : 'text-gray-700 dark:text-gray-300 hover:bg-white/20'} font-bold text-xs transition-all uppercase" do %>
+            <span>Sales History</span>
           <% end %>
         </nav>
 
@@ -72,37 +70,30 @@
         </div>
       </main>
 
-      <!-- Mobile Nav for SalesHP -->
+      <!-- Mobile Nav for SalesHP (Simplified) -->
       <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong-style border-t border-white/20 pb-safe">
         <div class="flex justify-around items-center h-16 px-4">
-          <%= link_to root_path, class: "flex items-center gap-1 text-purple-600" do %>
-            <span class="text-[10px] font-black uppercase tracking-widest">Dash</span>
+          <%= link_to root_path, class: "flex flex-col items-center gap-1 #{current_page?(root_path) ? 'text-purple-600' : 'text-gray-400'}" do %>
+            <span class="text-xl">📊</span>
+            <span class="text-[8px] font-black uppercase tracking-widest">Dash</span>
           <% end %>
-          <button onclick="document.getElementById('post-modal').classList.toggle('hidden')" class="w-10 h-10 bg-gradient-to-br from-purple-500 to-emerald-500 rounded-xl shadow-lg -mt-8 flex items-center justify-center text-white">+</button>
-          <%= link_to orders_path, class: "text-gray-500 text-[10px] font-black uppercase tracking-widest" do %>
-            <span>Orders</span>
+          <div class="w-10"></div> <!-- Gap for FAB -->
+          <%= link_to analytics_path, class: "flex flex-col items-center gap-1 #{current_page?(analytics_path) ? 'text-purple-600' : 'text-gray-400'}" do %>
+            <span class="text-xl">📜</span>
+            <span class="text-[8px] font-black uppercase tracking-widest">History</span>
           <% end %>
         </div>
       </nav>
 
     </div>
 
-    <!-- 7. Quick Post Modal (Global) -->
-    <div class="fixed bottom-10 right-10 z-50 hidden lg:block">
-      <button onclick="document.getElementById('post-modal').classList.toggle('hidden')" class="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl shadow-2xl shadow-purple-600/30 text-white text-3xl font-bold flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
-        +
-      </button>
-    </div>
 
     <div id="post-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
       <div class="glass-strong-style w-full max-w-lg rounded-[2.5rem] p-10 relative">
         <button onclick="document.getElementById('post-modal').classList.add('hidden')" class="absolute top-8 right-8 text-gray-500 hover:text-white text-2xl">×</button>
         <h4 class="text-2xl font-display font-black text-gray-800 dark:text-white mb-8">Post Sales Transaction</h4>
         <%= form_with model: SalesEntry.new, url: sales_entries_path, class: "space-y-6" do |f| %>
-          <div class="space-y-2">
-            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Assigned Mission</label>
-            <%= f.select :goal_id, @user.goals.where(active: true).map { |g| [g.title, g.id] }, { selected: (@goal&.id || @user.master_ledger.id) }, class: "w-full bg-white/10 dark:bg-gray-800 border-white/20 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none" %>
-          </div>
+          <%= f.hidden_field :goal_id, value: @user.master_ledger.id %>
           <div class="space-y-2">
             <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Receipt Amount</label>
             <%= f.number_field :amount, placeholder: "50,000", class: "w-full bg-white/10 border-white/20 rounded-2xl px-6 py-4 text-lg font-black focus:ring-4 focus:ring-purple-500/20 text-gray-800 dark:text-white outline-none", required: true %>
@@ -123,5 +114,23 @@
         <% end %>
       </div>
     </div>
+    <!-- 7. Global Record Sale Button (Floating Bottom Right) - FORCE STYLE -->
+    <button onclick="document.getElementById('post-modal').classList.remove('hidden')" 
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 99999; background: linear-gradient(135deg, #9333ea, #4f46e5); color: white; border: none; padding: 18px 32px; border-radius: 20px; box-shadow: 0 20px 40px rgba(147, 51, 234, 0.4); font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease-in-out;"
+            onmouseover="this.style.transform='scale(1.1)'"
+            onmouseout="this.style.transform='scale(1)'">
+      <span style="font-size: 24px;">+</span>
+      <span style="text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Record Sale</span>
+    </button>
+
+    <style>
+      @keyframes bounce-subtle {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+      .animate-bounce-subtle {
+        animation: bounce-subtle 2s infinite ease-in-out;
+      }
+    </style>
   </body>
 </html>

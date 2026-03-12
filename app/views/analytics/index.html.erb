@@ -8,7 +8,7 @@
       <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mt-1 ml-1">Comprehensive Sales Audit</p>
     </div>
     <div class="glass-style rounded-2xl px-6 py-3 flex items-center gap-3">
-      <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Lifetime:</span>
+      <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Overall:</span>
       <span class="text-sm font-bold text-emerald-500 tabular-nums tracking-wider font-mono">
         ₦<%= number_with_delimiter(@revenue_total.to_i) %>
       </span>
@@ -96,7 +96,6 @@
         <h3 class="text-xl font-display font-black tracking-tight">Recent Activity</h3>
         <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Snapshot of latest entries</p>
       </div>
-      <%= link_to "View All Records →", orders_path, class: "text-[10px] font-black text-purple-500 bg-purple-500/10 px-6 py-3 rounded-full hover:bg-purple-500/20 uppercase tracking-widest transition-all" %>
     </div>
 
     <div class="overflow-x-auto">

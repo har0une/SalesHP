@@ -10,10 +10,10 @@ class SalesEntriesController < ApplicationController
     @sales_entry = target_goal.sales_entries.new(sales_entry_params)
 
     if @sales_entry.save
-      redirect_to root_path, notice: "Sale tracked successfully! +\#{@sales_entry.xp_earned} XP"
+      redirect_to root_path, notice: "Sale tracked successfully! +#{@sales_entry.xp_earned} XP"
     else
       # For now, we'll just redirect back with an alert since it's a "Quick Log"
-      redirect_to root_path, alert: "Failed to track sale: \#{@sales_entry.errors.full_messages.join(', ')}"
+      redirect_to root_path, alert: "Failed to track sale: #{@sales_entry.errors.full_messages.join(', ')}"
     end
   end
 

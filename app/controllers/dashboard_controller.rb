@@ -18,35 +18,22 @@ class DashboardController < ApplicationController
     @strength = @global_patterns.sales_strength
     @streak_avg = @user.average_revenue_during_streak
 
-    if @goal
-      # Performance Engine (Level 3)
-      @brain = SalesHp::GoalBrain.new(@goal)
-      @method_analysis = SalesHp::MethodAnalysis.new(@goal)
-      @mission_brain = SalesHp::MissionBrain.new(@goal, @brain)
-      
-      @probability = @brain.success_probability
-      @velocity = @brain.velocity_multiplier
-      @recovery_daily = @brain.required_daily_recovery
-      @projected_revenue = @brain.projected_total_revenue
-      @projected_pct = @brain.projected_completion_pct
-      @variance = @brain.progress_variance_pct
-      @effectiveness = @method_analysis.method_effectiveness
-      @recommendation = @method_analysis.recommendation
-      @mission = @mission_brain.current_mission
-      @recent_sales = @goal.sales_entries.active.order(created_at: :desc).limit(5)
-    else
-      # Simple Mode (Level 1)
-      @probability = 0
-      @velocity = 1.0
-      @recovery_daily = 0
-      @projected_revenue = 0
-      @projected_pct = 0
-      @variance = 0
-      @effectiveness = []
-      @recommendation = "Enable a target goal to unlock professional strategy insights."
-      @mission = nil # No missions without goals
-      @recent_sales = @all_user_sales.order(created_at: :desc).limit(5)
-    end
+    # Momentum & strategy Engine (Global)
+    @momentum = SalesHp::MomentumBrain.new(@all_user_sales)
+    @method_analysis = SalesHp::MethodAnalysis.new(@all_user_sales)
+    
+    @velocity = @momentum.momentum_velocity
+    @variance = @momentum.growth_variance
+    @recommendation = @momentum.recommendation
+    @status = @momentum.status_label
+    
+    @probability = 0
+    @recovery_daily = 0
+    @projected_revenue = @momentum.projected_monthly_revenue
+    @projected_pct = (@variance > 0 ? @variance : 0) 
+    @effectiveness = @method_analysis.method_effectiveness
+    @mission = nil 
+    @recent_sales = @all_user_sales.order(created_at: :desc).limit(5)
   end
 end
 

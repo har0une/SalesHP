@@ -2,7 +2,7 @@
 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
   <div>
     <h1 class="text-4xl font-display font-black tracking-tight bg-gradient-to-r from-purple-600 to-emerald-600 bg-clip-text text-transparent">
-      Dashboard Ops
+      Dashboard
     </h1>
     <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mt-1 ml-1">Real-time Performance Sync</p>
   </div>
@@ -39,36 +39,6 @@
   <% end %>
 </div>
 
-<% if @mission %>
-  <!-- 2. Strategy Advisory Banner -->
-  <div class="glass-style rounded-3xl p-6 border-2 mb-10 relative overflow-hidden group transition-all" 
-       style="border-color: <%= @mission[:type] == :urgent ? 'rgba(239, 68, 68, 0.3)' : (@mission[:type] == :warning ? 'rgba(245, 158, 11, 0.3)' : 'rgba(168, 85, 247, 0.3)') %>; 
-              background: <%= @mission[:type] == :urgent ? 'rgba(239, 68, 68, 0.05)' : (@mission[:type] == :warning ? 'rgba(245, 158, 11, 0.05)' : 'rgba(168, 85, 247, 0.05)') %>">
-    <div class="flex items-start gap-5 relative z-10">
-      <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl <%= @mission[:type] == :urgent ? 'bg-red-500/20' : (@mission[:type] == :warning ? 'bg-amber-500/20' : 'bg-purple-500/20') %>">
-        <%= @mission[:icon] %>
-      </div>
-      <div class="flex-1">
-        <div class="flex flex-wrap gap-2 mb-2">
-          <span class="px-3 py-1 glass-style rounded-full text-[10px] font-black tracking-widest uppercase text-emerald-600 dark:text-emerald-400">
-            💡 <%= @recommendation %>
-          </span>
-          <% if @mission[:type] == :urgent %>
-            <span class="px-3 py-1 bg-red-500/20 rounded-full text-[10px] font-black tracking-widest uppercase text-red-600 animate-pulse">
-              Urgent Mission
-            </span>
-          <% end %>
-        </div>
-        <h3 class="text-lg font-display font-black text-gray-800 dark:text-white mb-1">
-          <%= @mission[:title] %>
-        </h3>
-        <p class="text-xs text-gray-500 font-medium">
-          <%= @mission[:description] %>
-        </p>
-      </div>
-    </div>
-  </div>
-<% end %>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
   <!-- 3. HP & XP Panel -->
@@ -106,16 +76,7 @@
       </div>
     </div>
 
-    <div class="mt-8 flex items-center justify-between pt-6 border-t border-white/10">
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/20">
-          <span class="text-xl font-black text-white text-center leading-tight">RANK<br><%= (@user.rank || "E").split(" ").first %></span>
-        </div>
-        <div>
-          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Title</p>
-          <p class="text-lg font-display font-black text-gray-800 dark:text-gray-100"><%= @user.rank || "Rookie" %></p>
-        </div>
-      </div>
+    <div class="mt-8 flex items-center justify-end pt-6 border-t border-white/10">
       <div class="text-right">
         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Streak</p>
         <p class="text-3xl font-black text-orange-500 italic tracking-tighter">🔥 <%= @user.current_streak.to_s.rjust(2, '0') %></p>
@@ -128,29 +89,27 @@
 
   <!-- 4. Stats Mini-Grid -->
   <div class="grid grid-cols-2 gap-4">
-    <% if @goal %>
-      <!-- Estimated Completion Card -->
-      <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-           <span class="text-xl">🎯</span>
-        </div>
-        <h3 class="text-3xl font-display font-black tracking-tighter mb-1"><%= @projected_pct %>%</h3>
-        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Est. Completion</p>
+    <!-- Estimated Progress Card -->
+    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
+      <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+         <span class="text-xl">🎯</span>
       </div>
-      <!-- Variance Card -->
-      <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
-        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-           <span class="text-xl">⚡</span>
-        </div>
-        <h3 class="text-3xl font-display font-black tracking-tighter mb-1 <%= @variance >= 0 ? 'text-emerald-500' : 'text-red-500' %>">
-          <%= @variance > 0 ? '+' : '' %><%= @variance %>%
-        </h3>
-        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Growth Variance</p>
+      <h3 class="text-3xl font-display font-black tracking-tighter mb-1"><%= @projected_pct %>%</h3>
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Momentum Growth</p>
+    </div>
+    <!-- Variance Card -->
+    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
+      <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+         <span class="text-xl">⚡</span>
       </div>
-    <% end %>
+      <h3 class="text-3xl font-display font-black tracking-tighter mb-1 <%= @variance >= 0 ? 'text-emerald-500' : 'text-red-500' %>">
+        <%= @variance > 0 ? '+' : '' %><%= @variance %>%
+      </h3>
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Growth Variance</p>
+    </div>
 
     <!-- Avg Deal Card -->
-    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all <%= 'col-span-2 py-10 flex flex-col items-center text-center' unless @goal %>">
+    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
       <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
          <span class="text-xl">💰</span>
       </div>
@@ -160,7 +119,7 @@
       <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Avg Deal Size</p>
     </div>
     <!-- Active Days Card -->
-    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all <%= 'col-span-2 py-10 flex flex-col items-center text-center' unless @goal %>">
+    <div class="glass-style rounded-3xl p-6 group hover:scale-[1.02] transition-all">
       <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
          <span class="text-xl">📅</span>
       </div>
@@ -201,9 +160,14 @@
 
   <!-- 6. Performance Logs -->
   <div class="glass-style rounded-3xl p-8">
-    <div class="flex items-center justify-between mb-8">
-      <h3 class="text-lg font-display font-black tracking-tight">Performance Logs</h3>
-      <button class="text-[10px] font-black text-purple-500 hover:underline uppercase tracking-widest">Sync History</button>
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-purple-500/30">
+      <div>
+        <h3 class="text-lg font-display font-black tracking-tight">Performance Logs</h3>
+        <p class="text-[9px] font-black text-purple-500 uppercase tracking-widest">Showing last 5 entries</p>
+      </div>
+      <%= link_to analytics_path, style: "background: #9333ea; color: white; padding: 12px 24px; border-radius: 12px; font-size: 10px; font-weight: 900; letter-spacing: 1px; text-decoration: none; box-shadow: 0 10px 20px rgba(147, 51, 234, 0.2);" do %>
+        VIEW FULL HISTORY →
+      <% end %>
     </div>
     <div class="space-y-3">
       <% @recent_sales.each do |sale| %>

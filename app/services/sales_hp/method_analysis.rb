@@ -1,24 +1,23 @@
 module SalesHp
   class MethodAnalysis
-    def initialize(goal)
-      @goal = goal
-      @active_sales = goal.sales_entries.active
+    def initialize(active_sales)
+      @active_sales = active_sales
       @total_revenue = @active_sales.sum(:amount)
     end
 
     def method_effectiveness
       # We group by method and calculate revenue and deal count
-      @active_sales.group(:method).select(
-        'method',
-        'SUM(amount) as total_amount',
-        'COUNT(*) as deal_count'
-      ).map do |stat|
+      stats = @active_sales.group(:method).sum(:amount)
+      counts = @active_sales.group(:method).count
+
+      stats.map do |method, revenue|
+        deal_count = counts[method] || 0
         {
-          name: stat.method,
-          revenue: stat.total_amount,
-          deals: stat.deal_count,
-          percentage: @total_revenue > 0 ? (stat.total_amount / @total_revenue.to_f * 100).to_i : 0,
-          avg_deal: stat.deal_count > 0 ? (stat.total_amount / stat.deal_count.to_f).to_i : 0
+          name: method.to_s.titleize,
+          revenue: revenue,
+          deals: deal_count,
+          percentage: @total_revenue > 0 ? (revenue / @total_revenue.to_f * 100).to_i : 0,
+          avg_deal: deal_count > 0 ? (revenue / deal_count.to_f).to_i : 0
         }
       end
     end
